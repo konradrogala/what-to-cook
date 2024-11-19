@@ -10,12 +10,11 @@ class RecipesController < ApplicationController
       ingredients = ingredient_query.split(",").map(&:strip).reject(&:blank?)
 
       @recipes = if ingredients.any?
-                   Recipe.joins(:ingredients)
-                         .where("ingredients.name ILIKE ANY (ARRAY[?])", ingredients.map { |i| "%#{i}%" })
-                         .distinct
-                         .includes(:ingredients) # Eager loading for widok
+        Recipe.joins(:ingredients)
+              .where("ingredients.name ILIKE ANY (ARRAY[?])", ingredients.map { |i| "%#{i}%" })
+              .distinct
       else
-                   []
+        []
       end
     end
 
