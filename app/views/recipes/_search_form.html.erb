@@ -1,6 +1,5 @@
-<%= form_with url: search_recipes_path, method: :post do |form| %>
+<%= form_with url: search_recipes_path, method: :post, class: "max-w-md mx-auto space-y-4 font-[sans-serif] text-[#333] mt-4" do |form| %>
   <%= form.search_field :ingredient_search, value: params[:ingredient_search], placeholder: "Szukaj po składnikach (oddziel przecinkami)", oninput: "this.form.requestSubmit()" %>
 <% end %>
 
 <div id="search_results"></div>
-

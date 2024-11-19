@@ -1,7 +1,3 @@
 <%= recipes.count %>
-<% recipes.each do |recipe| %>
-  <br>
-  <%= link_to recipe do %>
-    <%= highlight(recipe.title, params.dig(:title_search)) %>
-  <% end %>
-<% end %>
+
+<%= render "table", recipes: @recipes %>
