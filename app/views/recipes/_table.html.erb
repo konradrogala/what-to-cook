@@ -1,0 +1,38 @@
+<div class="font-sans overflow-x-auto">
+  <table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-gray-100 whitespace-nowrap">
+      <tr>
+        <th class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          Title
+        </th>
+        <th class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          Ingredients
+        </th>
+        <th class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          Cook time
+        </th>
+        <th class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          Author
+        </th>
+      </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200 whitespace-nowrap">
+      <% recipes.each do |recipe| %>
+        <tr>
+          <td class="px-4 py-4 text-sm text-gray-800">
+            <%= recipe.title %>
+          </td>
+          <td class="px-4 py-4 text-sm text-gray-800 w-64 whitespace-normal break-words">
+            <%= recipe.ingredients.pluck(:name).join(", ") %>
+          </td>
+          <td class="px-4 py-4 text-sm text-gray-800">
+            <%= recipe.cook_time %> min
+          </td>
+          <td class="px-4 py-4 text-sm text-gray-800">
+            <%= recipe.author %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
