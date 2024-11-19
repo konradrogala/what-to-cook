@@ -1,0 +1,6 @@
+<%= form_with url: search_recipes_path, method: :post do |form| %>
+  <%= form.search_field :ingredient_search, value: params[:ingredient_search], placeholder: "Szukaj po składnikach (oddziel przecinkami)", oninput: "this.form.requestSubmit()" %>
+<% end %>
+
+<div id="search_results"></div>
+
