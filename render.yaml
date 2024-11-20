@@ -1,19 +1,19 @@
 databases:
-  - name: postgres
-    databaseName: my_app_render
+  - name: what-to-cook-database
+    databaseName: whattocookdatabase
     user: whattocookdatabaseuser
     plan: free
 
 services:
   - type: web
-    name: my_app_render
+    name: what-to-cook
     runtime: ruby
     buildCommand: "./render-build.sh"
     startCommand: "bundle exec rails s"
     envVars:
       - key: DATABASE_URL
         fromDatabase:
-          name: postgres
+          name: what-to-cook-database
           property: connectionString
       - key: RAILS_MASTER_KEY
         sync:false- key: WEB_CONCURRENCY
