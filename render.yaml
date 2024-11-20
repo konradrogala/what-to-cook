@@ -16,5 +16,6 @@ services:
           name: what-to-cook-database
           property: connectionString
       - key: RAILS_MASTER_KEY
-        sync:false- key: WEB_CONCURRENCY
+        sync: false
+      - key: WEB_CONCURRENCY
         value: 2
