@@ -4,20 +4,9 @@ class FindRecipesByIngredients
   end
 
   def result
-    query_without_commas = ingredient_query.gsub(",", "").strip
+    return [] if query_without_commas.length < 2 || matching_ingredients_ids.empty?
 
-    if query_without_commas.length < 2
-      @recipes = []
-    else
-      if matching_ingredients.any?
-        @recipes = Recipe.joins(:recipe_ingredients)
-                         .where(recipe_ingredients: { ingredient_id: matching_ingredients })
-                         .group("recipes.id")
-                         .having("COUNT(DISTINCT recipe_ingredients.ingredient_id) >= ?", ingredients.size).includes(:ingredients)
-      else
-        @recipes = []
-      end
-    end
+    Recipe.by_ingredients(matching_ingredients_ids, ingredients.size)
   end
 
   private
@@ -32,9 +21,13 @@ class FindRecipesByIngredients
     @ingredients ||= ingredient_query.split(",").map(&:strip).reject(&:blank?)
   end
 
-  def matching_ingredients
-   ingredients.flat_map do |ingredient|
+  def matching_ingredients_ids
+    @matching_ingredients_ids ||= ingredients.flat_map do |ingredient|
       Ingredient.search_by_name(ingredient).pluck(:id)
     end
+  end
+
+  def query_without_commas
+    @query_without_commas ||= ingredient_query.gsub(",", "").strip
   end
 end
