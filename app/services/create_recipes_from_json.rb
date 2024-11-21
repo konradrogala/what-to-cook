@@ -51,9 +51,7 @@ class CreateRecipesFromJson
       recipe_id: recipe.id,
       ingredient_id: ingredient_id,
       amount: ingredient_data[:amount],
-      unit: ingredient_data[:unit],
-      created_at: Time.current,
-      updated_at: Time.current
+      unit: ingredient_data[:unit]
     }
   end
 
@@ -71,11 +69,19 @@ class CreateRecipesFromJson
     if match
       {
         amount: match[1]&.strip || "1",
-        unit: match[2]&.strip || "piece",
+        unit: unit(match),
         name: match[3]&.strip || match[2]&.strip || "unknown"
       }
     else
       { error: "Nie udało się sparsować: #{ingredient}" }
+    end
+  end
+
+  def unit(match)
+    if match[3]&.strip.nil?
+      ""
+    else
+      match[2]&.strip || "piece"
     end
   end
 
