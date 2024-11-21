@@ -10,14 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_11_21_083530) do
+ActiveRecord::Schema[7.2].define(version: 2024_11_21_083659) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "pg_trgm"
   enable_extension "plpgsql"
 
   create_table "ingredients", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_ingredients_on_name", opclass: :gin_trgm_ops, using: :gin
   end
 
   create_table "recipe_ingredients", force: :cascade do |t|
