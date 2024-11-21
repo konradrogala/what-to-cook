@@ -1,0 +1,41 @@
+<div class="container mx-auto mt-8">
+  <h1 class="text-2xl font-bold mb-4"><%= @recipe.title %></h1>
+  
+  <div class="mb-4">
+    <img src="<%= @recipe.image_url %>" alt="<%= @recipe.title %>" class="w-full max-w-lg rounded shadow-md">
+  </div>
+
+  <div class="mb-6">
+    <p><strong>Cuisine:</strong> <%= @recipe.cuisine.presence || "N/A" %></p>
+    <p><strong>Category:</strong> <%= @recipe.category.presence || "N/A" %></p>
+    <p><strong>Author:</strong> <%= @recipe.author.presence || "Unknown" %></p>
+    <p><strong>Cook Time:</strong> <%= @recipe.cook_time %> min</p>
+    <p><strong>Prep Time:</strong> <%= @recipe.prep_time %> min</p>
+    <p><strong>Rating:</strong> <%= @recipe.rating / 100.0 %> / 5</p>
+  </div>
+
+  <h2 class="text-xl font-semibold mb-4">Ingredients</h2>
+
+  <table class="table-auto w-full border border-gray-200">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">Ingredient</th>
+        <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">Amount</th>
+        <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">Unit</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @recipe.recipe_ingredients.each do |recipe_ingredient| %>
+        <tr class="border-t">
+          <td class="px-4 py-2 text-sm text-gray-700"><%= recipe_ingredient.ingredient.name %></td>
+          <td class="px-4 py-2 text-sm text-gray-700"><%= recipe_ingredient.amount %></td>
+          <td class="px-4 py-2 text-sm text-gray-700"><%= recipe_ingredient.unit %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <div class="mt-6">
+    <%= link_to 'Back to Recipes', recipes_path, class: 'text-blue-500 hover:underline' %>
+  </div>
+</div>

@@ -1,4 +1,7 @@
 class RecipesController < ApplicationController
+  def show
+    @recipe = Recipe.includes(:ingredients).find(params[:id])
+  end
   def search
     ingredient_query = params[:ingredient_search].to_s.strip
 
@@ -21,7 +24,7 @@ class RecipesController < ApplicationController
         @recipes = Recipe.joins(:recipe_ingredients)
                          .where(recipe_ingredients: { ingredient_id: matching_ingredients })
                          .group("recipes.id")
-                         .having("COUNT(DISTINCT recipe_ingredients.ingredient_id) >= ?", ingredients.size)
+                         .having("COUNT(DISTINCT recipe_ingredients.ingredient_id) >= ?", ingredients.size).includes(:ingredients)
       else
         @recipes = []
       end
