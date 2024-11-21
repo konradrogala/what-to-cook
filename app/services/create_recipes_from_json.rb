@@ -4,41 +4,13 @@ class CreateRecipesFromJson
   end
 
   def create
-    recipes = JSON.parse(File.read(file_path))
+    recipes = parse_recipes
 
     Recipe.transaction do
-      recipes.each do |recipe|
-        created_recipe = Recipe.create!(
-          title: recipe["title"],
-          cook_time: recipe["cook_time"],
-          prep_time: recipe["prep_time"],
-          rating: recipe["ratings"] * 100,
-          cuisine: recipe["cuisine"],
-          author: recipe["author"],
-          category: recipe["category"],
-          image_url: recipe["image"]
-        )
-
-        ingredients_data = recipe["ingredients"].map do |ingredient|
-          ingredient_data = parse_ingredient(ingredient)
-
-          ingredient_id = existing_ingredients[ingredient_data[:name]] ||
-                          Ingredient.create!(name: ingredient_data[:name]).id
-          existing_ingredients[ingredient_data[:name]] ||= ingredient_id
-
-          {
-            recipe_id: created_recipe.id,
-            ingredient_id: ingredient_id,
-            amount: ingredient_data[:amount],
-            unit: ingredient_data[:unit],
-            created_at: Time.now,
-            updated_at: Time.now
-          }
-        end
-
-        RecipeIngredient.insert_all(ingredients_data)
-
-        progressbar(recipes.size).increment
+      recipes.each_with_index do |recipe_data, index|
+        created_recipe = create_recipe(recipe_data)
+        create_ingredients_for_recipe(created_recipe, recipe_data["ingredients"])
+        update_progress(index + 1, recipes.size)
       end
     end
   end
@@ -47,34 +19,64 @@ class CreateRecipesFromJson
 
   attr_reader :file_path
 
+  def parse_recipes
+    JSON.parse(File.read(file_path))
+  rescue JSON::ParserError => e
+    raise "Nie udało się sparsować pliku JSON: #{e.message}"
+  end
+
+  def create_recipe(data)
+    Recipe.create!(
+      title: data["title"],
+      cook_time: data["cook_time"],
+      prep_time: data["prep_time"],
+      rating: (data["ratings"] * 100).to_i,
+      cuisine: data["cuisine"],
+      author: data["author"],
+      category: data["category"],
+      image_url: data["image"]
+    )
+  end
+
+  def create_ingredients_for_recipe(recipe, ingredients)
+    ingredients_data = ingredients.map { |ingredient| prepare_ingredient_data(recipe, ingredient) }
+    RecipeIngredient.insert_all(ingredients_data)
+  end
+
+  def prepare_ingredient_data(recipe, ingredient)
+    ingredient_data = parse_ingredient(ingredient)
+    ingredient_id = find_or_create_ingredient(ingredient_data[:name])
+
+    {
+      recipe_id: recipe.id,
+      ingredient_id: ingredient_id,
+      amount: ingredient_data[:amount],
+      unit: ingredient_data[:unit],
+      created_at: Time.current,
+      updated_at: Time.current
+    }
+  end
+
+  def find_or_create_ingredient(name)
+    existing_ingredients[name] ||= Ingredient.create!(name: name).id
+  end
+
+  def update_progress(current, total)
+    progressbar(total).increment if current <= total
+  end
+
   def parse_ingredient(ingredient)
     match = ingredient.match(/^([\d\s⅓⅔¾½¼¾\/]+)?\s*(\(.+?\)\s*\w+|\w+)?\s*(.+)?/)
 
     if match
       {
-        amount: amount(match),
-        unit: unit(match),
-        name: name(match)
+        amount: match[1]&.strip || "1",
+        unit: match[2]&.strip || "piece",
+        name: match[3]&.strip || match[2]&.strip || "unknown"
       }
     else
       { error: "Nie udało się sparsować: #{ingredient}" }
     end
-  end
-
-  def amount(match)
-    match[1]&.strip || "1"
-  end
-
-  def unit(match)
-    if match[3]&.strip.nil?
-      ""
-    else
-      match[2]&.strip || "piece"
-    end
-  end
-
-  def name(match)
-    match[3]&.strip || match[2]&.strip || "uknown"
   end
 
   def progressbar(total)

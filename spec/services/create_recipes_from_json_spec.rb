@@ -42,9 +42,16 @@ RSpec.describe CreateRecipesFromJson do
         subject.create
         recipe = Recipe.last
         expect(recipe.recipe_ingredients.count).to eq(2)
-        expect(recipe.recipe_ingredients.first.amount).to eq("1")
-        expect(recipe.recipe_ingredients.first.unit).to eq("cup")
-        expect(recipe.recipe_ingredients.first.ingredient.name).to eq("all-purpose flour")
+
+        first_ingredient = recipe.recipe_ingredients.first
+        expect(first_ingredient.amount).to eq("1")
+        expect(first_ingredient.unit).to eq("cup")
+        expect(first_ingredient.ingredient.name).to eq("all-purpose flour")
+
+        second_ingredient = recipe.recipe_ingredients.second
+        expect(second_ingredient.amount).to eq("½")
+        expect(second_ingredient.unit).to eq("teaspoon")
+        expect(second_ingredient.ingredient.name).to eq("salt")
       end
     end
 
@@ -56,7 +63,7 @@ RSpec.describe CreateRecipesFromJson do
       end
 
       it 'raises a JSON::ParserError' do
-        expect { subject.create }.to raise_error(JSON::ParserError)
+        expect { subject.create }.to raise_error(RuntimeError, /Nie udało się sparsować pliku JSON/)
       end
     end
 
@@ -68,15 +75,24 @@ RSpec.describe CreateRecipesFromJson do
       it 'does not create duplicate ingredients' do
         expect { subject.create }.to change { Ingredient.count }.by(1)
       end
+
+      it 'associates the existing ingredient with the recipe' do
+        subject.create
+        recipe = Recipe.last
+        expect(recipe.ingredients.map(&:name)).to include("all-purpose flour")
+      end
     end
   end
 
   describe '#parse_ingredient' do
     let(:instance) { described_class.new(file_path) }
 
-    it 'parses ingredient string correctly' do
+    it 'parses ingredient strings correctly' do
       result = instance.send(:parse_ingredient, "1 cup all-purpose flour")
-      expect(result).to eq({ amount: "1", unit: "cup", name: "all-purpose flour" })
+      expect(result).to eq(amount: "1", unit: "cup", name: "all-purpose flour")
+
+      result = instance.send(:parse_ingredient, "½ teaspoon salt")
+      expect(result).to eq(amount: "½", unit: "teaspoon", name: "salt")
     end
   end
 end
