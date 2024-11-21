@@ -1,0 +1,22 @@
+databases:
+  - name: what-to-cook-database
+    databaseName: whattocookdatabase
+    user: whattocookdatabaseuser
+    plan: free
+
+services:
+  - type: web
+    plan: free
+    name: what-to-cook
+    env: ruby
+    buildCommand: "./bin/render-build.sh"
+    startCommand: "bundle exec puma -C config/puma.rb"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: what-to-cook-database
+          property: connectionString
+      - key: RAILS_MASTER_KEY
+        sync: false
+      - key: WEB_CONCURRENCY
+        value: 2
