@@ -1,4 +1,5 @@
 class RecipesController < ApplicationController
+  include Pagy::Backend
   def search
     ingredient_query = params[:ingredient_search].to_s.strip
 
@@ -27,14 +28,11 @@ class RecipesController < ApplicationController
       end
     end
 
+    @pagy, @records = pagy_countless(@recipes, item: 10)
+
     respond_to do |format|
-      format.turbo_stream do
-        render turbo_stream: turbo_stream.update(
-          "search_results",
-          partial: "recipes/search_results",
-          locals: { recipes: @recipes }
-        )
-      end
+      format.html
+      format.turbo_stream
     end
   end
 end
