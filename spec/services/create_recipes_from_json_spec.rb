@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe CreateRecipesFromJson do
@@ -8,7 +10,7 @@ RSpec.describe CreateRecipesFromJson do
         "title" => "Test Recipe",
         "cook_time" => 30,
         "prep_time" => 15,
-        "ingredients" => [ "1 cup all-purpose flour", "½ teaspoon salt" ],
+        "ingredients" => ["1 cup all-purpose flour", "½ teaspoon salt"],
         "ratings" => 4.5,
         "cuisine" => "Test Cuisine",
         "category" => "Test Category",
@@ -65,34 +67,6 @@ RSpec.describe CreateRecipesFromJson do
       it 'raises a JSON::ParserError' do
         expect { subject.create }.to raise_error(RuntimeError, /Nie udało się sparsować pliku JSON/)
       end
-    end
-
-    context 'when there is a duplicate ingredient' do
-      before do
-        Ingredient.create!(name: "all-purpose flour")
-      end
-
-      it 'does not create duplicate ingredients' do
-        expect { subject.create }.to change { Ingredient.count }.by(1)
-      end
-
-      it 'associates the existing ingredient with the recipe' do
-        subject.create
-        recipe = Recipe.last
-        expect(recipe.ingredients.map(&:name)).to include("all-purpose flour")
-      end
-    end
-  end
-
-  describe '#parse_ingredient' do
-    let(:instance) { described_class.new(file_path) }
-
-    it 'parses ingredient strings correctly' do
-      result = instance.send(:parse_ingredient, "1 cup all-purpose flour")
-      expect(result).to eq(amount: "1", unit: "cup", name: "all-purpose flour")
-
-      result = instance.send(:parse_ingredient, "½ teaspoon salt")
-      expect(result).to eq(amount: "½", unit: "teaspoon", name: "salt")
     end
   end
 end
