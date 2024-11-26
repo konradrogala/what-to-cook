@@ -11,7 +11,7 @@ Rails.application.routes.draw do
 
   resources :recipes do
     collection do
-      post "search"
+      get "search", defaults: { format: :turbo_stream }
     end
   end
 

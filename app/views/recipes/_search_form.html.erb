@@ -1,5 +1,13 @@
-<%= form_with url: search_recipes_path, method: :post, class: "max-w-md mx-auto space-y-4 font-[sans-serif] text-[#333] mt-4" do |form| %>
+<%= form_with url: search_recipes_path, method: :get, class: "max-w-md mx-auto space-y-4 font-[sans-serif] text-[#333] mt-4", data: { turbo_frame: 'results' } do |form| %>
   <%= form.search_field :ingredient_search, value: params[:ingredient_search], placeholder: "Find ingredients", oninput: "this.form.requestSubmit()" %>
 <% end %>
 
-<div id="search_results"></div>
+<%= turbo_frame_tag 'results', data: { turbo_action: 'advance' } do %>
+  <div id="recipes"></div>
+  <%= turbo_frame_tag 'pagination',
+                      src: search_recipes_path(ingredient_search: params[:ingredient_search]),
+                      loading: :lazy %>
+<% end %>
+
+
+
