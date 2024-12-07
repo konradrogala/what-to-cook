@@ -4,7 +4,7 @@ class FindRecipesByIngredients
   end
 
   def result
-    return [] if query_without_commas.length < 2 || matching_ingredients_ids.empty?
+    return Recipe.none if query_without_commas.length < 2 || matching_ingredients_ids.empty?
 
     Recipe.by_ingredients(matching_ingredients_ids, ingredients.size)
   end

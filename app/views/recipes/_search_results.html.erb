@@ -1,1 +1,10 @@
+
+<% if @pagy %>
+  <div id="next_link">
+    <%= button_to "next", pagy_url_for(@pagy, @pagy.next) %>
+  </div>
+<% end %>
+
+
 <%= render "table", recipes: @recipes %>
+

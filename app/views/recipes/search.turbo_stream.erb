@@ -1,0 +1,13 @@
+
+<% unless @recipes.empty? %>
+  <%= turbo_stream.append "recipes" do %>
+    <%= render "table", recipes: @recipes %>
+  <% end %>
+  <% if @pagy.next.present? %>
+    <%= turbo_stream.replace "pagination" do %>
+      <%= turbo_frame_tag "pagination",
+                          src: search_recipes_path(page: @pagy.next, ingredient_search: params[:ingredient_search]),
+                          loading: :lazy %>
+    <% end %>
+  <% end %>
+<% end %>
