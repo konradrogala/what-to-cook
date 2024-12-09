@@ -8,5 +8,8 @@ class Ingredient < ApplicationRecord
 
   pg_search_scope :search_by_name,
     against: :name,
-    using: { tsearch: { prefix: true }, trigram: {} }
+    using: {
+      tsearch: { prefix: true },
+      trigram: { threshold: 0.4 }
+    }
 end
