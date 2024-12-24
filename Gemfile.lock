@@ -172,7 +172,7 @@ GEM
     pg_search (2.3.7)
       activerecord (>= 6.1)
       activesupport (>= 6.1)
-    pry (0.15.0)
+    pry (0.15.1)
       coderay (~> 1.1)
       method_source (~> 1.0)
     psych (5.2.0)
